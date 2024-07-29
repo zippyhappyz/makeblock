@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'programs' %}">Программы</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'program_detail' course.program.id %}">{{ course.program }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ course.get_absolute_url }}">{{ course }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'quiz_index' course.slug %}">Квизы</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Форма с множественным выбором</li>
+    </ol>
+</nav>
+
+<div class="title-1">Добавить вопросы [{{ quiz_obj|truncatechars:15 }}]</div>
+<br><br>
+
+<div class="container">
+    <div class="info-text bg-orange mb-3">{{ quizQuestions }} вопрос добавлен</div>
+
+    <form action="#" method="POST">{% csrf_token %}
+        {% if form.errors %}<p class="alert alert-danger">Исправьте ошибку(и) ниже.</p>{% endif %}
+        <div class="row">
+            <div class="col mx-3 py-4 border bg-white">
+                <div class="mb-2" hidden>
+                    {{ form.quiz }}
+                </div>
+                {{ form.content|as_crispy_field }}
+                {{ form.figure|as_crispy_field }}
+                {{ form.explanation|as_crispy_field }}
+            </div>
+            <div class="col mx-3 py-4 border bg-white">
+                {{ form.choice_order|as_crispy_field }}
+                <div class="border p-2">
+                    <label class="lead">Выборы</label>
+                {{ formset.management_form }}
+                {% for fs in formset %}
+                    <label for="username">{{ fs.label }}</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">{{ fs.correct }} <small class="ml-1">Correct</small></span>
+                        </div>
+                        {{ fs.choice }}
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">{{ fs.DELETE }} <small class="ml-1">Удалить</small></span>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+        <button type="submit" formnovalidate name="another" class="btn btn-outline-primary">
+            Сохранить и добавить другое
+        </button>
+        <button class="btn btn-primary my-4" type="submit">Сохранить</button>
+    </form>
+</div>
+
+{% endblock %}

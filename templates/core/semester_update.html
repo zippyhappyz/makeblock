@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | Система управления обучением{% endblock title %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Главная</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'semester_list' %}">Список семестров</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Форма семестра</li>
+    </ol>
+</nav>
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>{{ message }}
+            </div>
+        {% else %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>{{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card pb-3">
+            <p class="form-title">Форма добавления и обновления семестра</p>
+            <div class="container"><br>
+                <form action="" method="POST">{% csrf_token %}
+                    {{ form|crispy }}
+                    <input class="btn btn-primary" type="submit" value="Сохранить">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}
+{% trans "Result of" %} {{ sitting.quiz.title }} {% trans "for" %} {{ sitting.user }} | Система управления обучением
+{% endblock %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Главная</a></li>
+		<li class="breadcrumb-item"><a href="{% url 'quiz_marking' %}">Завершенные экзамены</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Оценивание</li>
+	</ol>
+</nav>
+
+<div class="row col-12 justify-content-between">
+	<div class="header-title-md">{% trans "Название викторины" %}: {{ sitting.quiz.title }}</div>
+	<em class="info-text title-danger">{% trans "Категория" %}: {{ sitting.quiz.category }}</em>
+</div>
+
+<p>{{ sitting.quiz.description }}</p>
+<hr>
+<p><b>{% trans "Пользователь" %}:</b> {{ sitting.user }}</p>
+<p><b>{% trans "Завершено" %}:</b> {{ sitting.end|date }}</p>
+<p><b>{% trans "Оценка" %}:</b> {{ sitting.get_percent_correct }}%</p>
+<!-- <p><b>{% trans "Начало" %}:</b> {{ sitting.start }}</p>
+<p><b>{% trans "Конец" %}:</b> {{ sitting.end }}</p> -->
+
+<table class="table table-bordered table-striped">
+
+  <thead>
+	<tr>
+	  <th>{% trans "Вопрос" %}</th>
+	  <th>{% trans "Ответ пользователя" %}</th>
+	  <th></th>
+	  <th></th>
+	</tr>
+  </thead>
+
+  <tbody>
+{% for question in questions %}
+
+	<tr>
+      <td>
+        {{ question.content }}
+        {% if question.figure %}
+        <div style="max-width: 100px;"><img src="{{ question.figure.url }}" alt="{{ question.figure }}" width="100px"/></div>
+        {% endif %}
+      </td>
+	  <td>{{ question }}</td>
+	  <td>
+		{% if question.id in sitting.get_incorrect_questions %}
+		  <p>{% trans "неправильно" %}</p>
+		{% else %}
+		  <p>{% trans "Правильно" %}</p>
+		{% endif %}
+	  </td>
+	  <td>
+		<form action="" method="POST">{% csrf_token %}
+		  <input type="hidden" name="qid" value="{{ question.id }}">
+		  <button type="submit" class="btn btn-warning">{% trans "Переключить правильность ответа" %}</button>
+		</form>
+	  </td>
+	</tr>
+
+{% endfor %}
+
+  </tbody>
+
+</table>
+{% endblock %}

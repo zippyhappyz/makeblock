@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | Learning management system{% endblock title %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Главная</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Лекторы</li>
+    </ol>
+</nav>
+
+{% if request.user.is_superuser %}
+<div class="manage-wrap">
+    <a class="btn btn-primary" href="{% url 'add_lecturer' %}"><i class="fas fa-plus"></i>Добавить лектора</a>
+    <a class="btn btn-primary" target="_blank" href="{% url 'lecturer_list_pdf' %}"><i class="fas fa-download"></i> Скачать в PDF</a><!--new-->
+</div>
+{% endif %}
+
+<p class="title-1"><i class="fas fa-chalkboard-teacher"></i>Лекторы</p>
+
+{% include 'snippets/messages.html' %}
+{% include 'snippets/filter_form.html' %}
+
+<div class="table-responsive table-shadow table-light table-striped m-0 mt-4">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th> Номер ID </th>
+                <th> Полное имя </th>
+                <th> Email </th>
+                <th> Номер телефона </th>
+                <th> Адрес </th>
+                <th> Последний вход </th>
+                {% if request.user.is_superuser %}
+                <th> Действия </th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for lecturer in filter.qs %}
+            <tr>
+                <td> {{ forloop.counter }}.</td>
+                <td>{{ lecturer.username }}</td>
+                <td><a href="{% url 'profile_single' lecturer.id %}">{{ lecturer.get_full_name }}</a></td>
+                <td>{{ lecturer.email }}</td>
+                <td>{{ lecturer.phone }}</td>
+                <td>{{ lecturer.address }}</td>
+                <td>{{ lecturer.last_login }}</td>
+                {% if request.user.is_superuser %}
+                <td> 
+                    <div class="dropdown">
+                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu position-fixed">
+                          <li><a class="dropdown-item" href="{% url 'staff_edit' pk=lecturer.pk %}"><i class="fas fa-edit"></i> Обновить</a></li>
+                          <li><a class="dropdown-item"  target="_blank" href="{% url 'profile_single' lecturer.id %}?download_pdf=1"><i class="fas fa-download"></i> Скачать в PDF</a></li>
+                          <li><a class="dropdown-item text-danger" href="{% url 'lecturer_delete' pk=lecturer.pk %}"><i class="fas fa-trash-alt"></i> Удалить</a></li>
+                        </ul>
+                      </div>
+                </td>
+                {% endif %}
+                
+                {% empty %}
+                <tr>
+                  <td colspan="8">
+                  <span class="text-danger">
+                    No Lecturer(s).
+                    {% if request.user.is_superuser %}
+                    <a href="{% url 'add_lecturer' %}">
+                    <i class="primary" style="font-size: 22px;">
+                       Добавить лектора сейчас.
+                    </i>
+                    {% endif %}
+                    </a>
+                  </span>
+                </td>
+                </tr>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
